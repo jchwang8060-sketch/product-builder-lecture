@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>저녁 메뉴 추천 - Dinner Deck</title>
+    <title>부산백병원 간호사 3교대 스케줄러</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,106 +14,109 @@
         <header class="hero">
             <div class="brand">
                 <div class="brand-row">
-                    <span class="badge">오늘의 저녁</span>
+                    <span class="badge">부산백병원</span>
                     <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
                         <span class="theme-toggle__icon" aria-hidden="true">🌙</span>
                         <span class="theme-toggle__label">다크 모드</span>
                     </button>
                 </div>
-                <h1>Dinner Deck</h1>
-                <p>지금 기분과 시간에 맞춰 딱 맞는 저녁 메뉴를 추천해드려요.</p>
+                <h1>간호사 3교대 근무표</h1>
+                <p>필요 인원과 제약 조건을 입력하면 7일 기준 3교대 스케줄을 자동으로 생성합니다.</p>
             </div>
             <div class="hero-card">
-                <div class="hero-card__title">선호 조건</div>
+                <div class="hero-card__title">스케줄 조건</div>
                 <div class="filters">
                     <label class="filter">
-                        기분
-                        <select id="mood">
-                            <option value="any">상관없음</option>
-                            <option value="cozy">따뜻하고 포근한</option>
-                            <option value="crispy">바삭하고 통쾌한</option>
-                            <option value="light">가볍고 산뜻한</option>
-                            <option value="hearty">든든하고 묵직한</option>
+                        병동/파트
+                        <select id="ward">
+                            <option value="icu">중환자실</option>
+                            <option value="er">응급실</option>
+                            <option value="med">내과 병동</option>
+                            <option value="surg">외과 병동</option>
+                            <option value="ped">소아 병동</option>
                         </select>
                     </label>
                     <label class="filter">
-                        조리 시간
-                        <select id="time">
-                            <option value="any">상관없음</option>
-                            <option value="15">15분 이내</option>
-                            <option value="30">30분 이내</option>
-                            <option value="45">45분 이상</option>
-                        </select>
+                        시작일
+                        <input type="date" id="start-date">
                     </label>
                     <label class="filter">
-                        예산
-                        <select id="budget">
-                            <option value="any">상관없음</option>
-                            <option value="low">가볍게</option>
-                            <option value="mid">보통</option>
-                            <option value="high">플렉스</option>
-                        </select>
+                        간호사 수
+                        <input type="number" id="nurse-count" min="6" max="60" value="18">
                     </label>
                     <label class="filter">
-                        매운 정도
-                        <select id="spice">
-                            <option value="any">상관없음</option>
-                            <option value="mild">안 매운</option>
-                            <option value="medium">적당히</option>
-                            <option value="hot">얼큰하게</option>
+                        연속 나이트 제한
+                        <select id="night-limit">
+                            <option value="2">2회</option>
+                            <option value="3" selected>3회</option>
+                            <option value="4">4회</option>
                         </select>
+                    </label>
+                </div>
+                <div class="filters shift-filters">
+                    <label class="filter">
+                        데이(D) 필요 인원
+                        <input type="number" id="need-day" min="1" max="20" value="6">
+                    </label>
+                    <label class="filter">
+                        이브닝(E) 필요 인원
+                        <input type="number" id="need-evening" min="1" max="20" value="6">
+                    </label>
+                    <label class="filter">
+                        나이트(N) 필요 인원
+                        <input type="number" id="need-night" min="1" max="20" value="4">
+                    </label>
+                    <label class="filter">
+                        오프(O) 최소 인원
+                        <input type="number" id="need-off" min="0" max="20" value="2">
                     </label>
                 </div>
                 <div class="toggles">
                     <label class="toggle">
-                        <input type="checkbox" id="vegetarian">
-                        <span>채식 메뉴만</span>
+                        <input type="checkbox" id="night-rest" checked>
+                        <span>나이트 다음 날 데이 금지</span>
                     </label>
                     <label class="toggle">
-                        <input type="checkbox" id="no-seafood">
-                        <span>해산물 제외</span>
+                        <input type="checkbox" id="weekend-balance" checked>
+                        <span>주말 근무 분산</span>
                     </label>
                 </div>
-                <button id="recommend-btn">오늘 저녁 추천 받기</button>
+                <button id="recommend-btn">3교대 스케줄 생성</button>
                 <div class="status" id="status" aria-live="polite"></div>
             </div>
         </header>
 
         <main class="results">
             <section class="featured" aria-live="polite">
-                <div class="featured__label">추천 메뉴</div>
+                <div class="featured__label">7일 스케줄</div>
                 <div class="featured__content" id="featured-card">
-                    <div class="featured__emoji">🍜</div>
+                    <div class="featured__emoji">🩺</div>
                     <div class="featured__text">
-                        <h2 id="featured-title">김치찌개 & 따끈한 밥</h2>
-                        <p id="featured-desc">얼큰하면서도 포근한 국물로 하루 피로를 싹 풀어줘요.</p>
-                        <div class="meta" id="featured-meta">
-                            <span>30분 이내</span>
-                            <span>보통 예산</span>
-                            <span>얼큰</span>
-                        </div>
+                        <h2 id="featured-title">스케줄 생성 대기</h2>
+                        <p id="featured-desc">조건을 입력하고 생성 버튼을 눌러주세요.</p>
+                        <div class="schedule-table" id="schedule-table"></div>
                     </div>
                 </div>
             </section>
 
             <section class="alternatives">
                 <div class="alt-header">
-                    <h3>다른 후보</h3>
-                    <p>마음이 흔들리면 여기서 골라보세요.</p>
+                    <h3>스케줄 요약</h3>
+                    <p>교대 배정과 인원 요약을 확인하세요.</p>
                 </div>
                 <div class="alt-grid" id="alt-grid">
                     <article class="alt-card">
-                        <div class="alt-card__emoji">🥗</div>
+                        <div class="alt-card__emoji">📌</div>
                         <div>
-                            <h4>연어 포케</h4>
-                            <p>가볍고 산뜻한 한 그릇.</p>
+                            <h4>기본 패턴</h4>
+                            <p>현재 조건에 맞춘 기본 교대 로테이션.</p>
                         </div>
                     </article>
                     <article class="alt-card">
-                        <div class="alt-card__emoji">🍳</div>
+                        <div class="alt-card__emoji">📊</div>
                         <div>
-                            <h4>치킨 스테이크</h4>
-                            <p>겉바속촉, 단백질 든든.</p>
+                            <h4>인원 밸런스</h4>
+                            <p>야간/주말 분배를 균형 있게 유지합니다.</p>
                         </div>
                     </article>
                 </div>
@@ -121,8 +124,8 @@
         </main>
 
         <footer class="tips">
-            <div class="tip">작게 시작해도 좋아요. 냉장고 재료를 먼저 확인해보세요.</div>
-            <div class="tip">추천이 마음에 들지 않으면 다시 눌러주세요. 다른 메뉴가 나옵니다.</div>
+            <div class="tip">실제 근무표 확정 전 현장 규정과 휴게 기준을 반드시 확인하세요.</div>
+            <div class="tip">필요 인원과 제약을 조정하면 다른 스케줄이 생성됩니다.</div>
         </footer>
     </div>
 

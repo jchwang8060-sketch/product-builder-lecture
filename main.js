@@ -3,11 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const recommendBtn = document.getElementById('recommend-btn');
     const status = document.getElementById('status');
-    const featuredCard = document.getElementById('featured-card');
     const featuredTitle = document.getElementById('featured-title');
     const featuredDesc = document.getElementById('featured-desc');
-    const featuredMeta = document.getElementById('featured-meta');
+    const scheduleTable = document.getElementById('schedule-table');
     const altGrid = document.getElementById('alt-grid');
+    const startDateInput = document.getElementById('start-date');
+
+    const today = new Date();
+    if (startDateInput) {
+        startDateInput.valueAsDate = today;
+    }
 
     const menuItems = [
         {
@@ -125,16 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (recommendBtn) {
         recommendBtn.addEventListener('click', () => {
-            const filtered = filterMenus(menuItems);
-            if (filtered.length === 0) {
-                status.textContent = '조건에 맞는 메뉴가 없어요. 다른 조건으로 다시 골라주세요.';
+            const config = getConfig();
+            if (!config.valid) {
+                status.textContent = config.message;
                 return;
             }
-
-            const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-            updateFeatured(shuffled[0]);
-            updateAlternatives(shuffled.slice(1, 3));
-            status.textContent = `${filtered.length}개 중에서 추천했어요!`;
+            const schedule = buildSchedule(config);
+            renderSchedule(schedule);
+            renderSummary(schedule, config);
+            status.textContent = `${config.days}일 스케줄을 생성했어요. (${config.wardLabel})`;
         });
     }
 
@@ -149,74 +153,197 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
     }
 
-    function filterMenus(items) {
-        const mood = document.getElementById('mood').value;
-        const time = document.getElementById('time').value;
-        const budget = document.getElementById('budget').value;
-        const spice = document.getElementById('spice').value;
-        const vegetarian = document.getElementById('vegetarian').checked;
-        const noSeafood = document.getElementById('no-seafood').checked;
+    function getConfig() {
+        const ward = document.getElementById('ward');
+        const startDate = document.getElementById('start-date').value;
+        const nurseCount = Number(document.getElementById('nurse-count').value);
+        const nightLimit = Number(document.getElementById('night-limit').value);
+        const needDay = Number(document.getElementById('need-day').value);
+        const needEvening = Number(document.getElementById('need-evening').value);
+        const needNight = Number(document.getElementById('need-night').value);
+        const needOff = Number(document.getElementById('need-off').value);
+        const nightRest = document.getElementById('night-rest').checked;
+        const weekendBalance = document.getElementById('weekend-balance').checked;
 
-        return items.filter((item) => {
-            if (mood !== 'any' && !item.moods.includes(mood)) return false;
-            if (budget !== 'any' && item.budget !== budget) return false;
-            if (spice !== 'any' && item.spice !== spice) return false;
-            if (vegetarian && !item.vegetarian) return false;
-            if (noSeafood && item.seafood) return false;
-            if (time !== 'any') {
-                const limit = Number(time);
-                if (limit === 45 && item.time < 45) return false;
-                if (limit === 30 && item.time > 30) return false;
-                if (limit === 15 && item.time > 15) return false;
+        const totalPerDay = needDay + needEvening + needNight + needOff;
+        if (!startDate) {
+            return { valid: false, message: '시작일을 선택해주세요.' };
+        }
+        if (nurseCount < totalPerDay) {
+            return {
+                valid: false,
+                message: `하루 필요 인원(${totalPerDay}명)보다 간호사 수가 적어요.`
+            };
+        }
+        return {
+            valid: true,
+            wardLabel: ward.options[ward.selectedIndex].textContent,
+            startDate,
+            nurseCount,
+            nightLimit,
+            needDay,
+            needEvening,
+            needNight,
+            needOff,
+            nightRest,
+            weekendBalance,
+            days: 7
+        };
+    }
+
+    function buildSchedule(config) {
+        const nurses = Array.from({ length: config.nurseCount }, (_, i) => ({
+            name: `N${String(i + 1).padStart(2, '0')}`,
+            assignments: 0,
+            lastShift: null,
+            consecutiveNights: 0,
+            weekendCount: 0
+        }));
+
+        const start = new Date(config.startDate);
+        const days = [];
+
+        for (let d = 0; d < config.days; d += 1) {
+            const current = new Date(start);
+            current.setDate(start.getDate() + d);
+            const dayOfWeek = current.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+            const assigned = new Set();
+            const shifts = {
+                date: current,
+                day: [],
+                evening: [],
+                night: [],
+                off: []
+            };
+
+            assignShift(shifts.night, config.needNight, 'night');
+            assignShift(shifts.evening, config.needEvening, 'evening');
+            assignShift(shifts.day, config.needDay, 'day');
+            assignOff(shifts.off, config.needOff);
+
+            days.push(shifts);
+
+            function assignShift(target, count, type) {
+                for (let i = 0; i < count; i += 1) {
+                    const candidate = pickNurse(type);
+                    if (!candidate) break;
+                    target.push(candidate.name);
+                    assigned.add(candidate.name);
+                    candidate.assignments += 1;
+                    candidate.lastShift = type;
+                    candidate.consecutiveNights = type === 'night' ? candidate.consecutiveNights + 1 : 0;
+                    if (isWeekend) candidate.weekendCount += 1;
+                }
             }
-            return true;
-        });
+
+            function assignOff(target, count) {
+                const available = nurses
+                    .filter((n) => !assigned.has(n.name))
+                    .sort((a, b) => a.assignments - b.assignments);
+                for (let i = 0; i < count && i < available.length; i += 1) {
+                    const nurse = available[i];
+                    target.push(nurse.name);
+                    assigned.add(nurse.name);
+                    nurse.lastShift = 'off';
+                    nurse.consecutiveNights = 0;
+                }
+            }
+
+            function pickNurse(shiftType) {
+                const pool = nurses.filter((n) => {
+                    if (assigned.has(n.name)) return false;
+                    if (shiftType === 'day' && config.nightRest && n.lastShift === 'night') return false;
+                    if (shiftType === 'night' && n.consecutiveNights >= config.nightLimit) return false;
+                    return true;
+                });
+                if (pool.length === 0) return null;
+                return pool.sort((a, b) => {
+                    if (config.weekendBalance && isWeekend) {
+                        if (a.weekendCount !== b.weekendCount) {
+                            return a.weekendCount - b.weekendCount;
+                        }
+                    }
+                    if (a.assignments !== b.assignments) {
+                        return a.assignments - b.assignments;
+                    }
+                    return Math.random() - 0.5;
+                })[0];
+            }
+        }
+
+        return days;
     }
 
-    function updateFeatured(item) {
-        if (!featuredCard || !featuredTitle || !featuredDesc || !featuredMeta) return;
-        const emoji = featuredCard.querySelector('.featured__emoji');
-        if (emoji) emoji.textContent = item.emoji;
-        featuredTitle.textContent = item.title;
-        featuredDesc.textContent = item.desc;
-        featuredMeta.innerHTML = `
-            <span>${formatTime(item.time)}</span>
-            <span>${formatBudget(item.budget)}</span>
-            <span>${formatSpice(item.spice)}</span>
+    function renderSchedule(days) {
+        if (!scheduleTable || !featuredTitle || !featuredDesc) return;
+        featuredTitle.textContent = '3교대 스케줄 생성 완료';
+        featuredDesc.textContent = 'Day / Evening / Night 배정을 확인하세요.';
+
+        const header = `
+            <div class="schedule-row schedule-head">
+                <div class="schedule-date">날짜</div>
+                <div>Day</div>
+                <div>Evening</div>
+                <div>Night</div>
+            </div>
         `;
-    }
 
-    function updateAlternatives(items) {
-        if (!altGrid) return;
-        altGrid.innerHTML = items
-            .map((item) => {
+        const rows = days
+            .map((day) => {
+                const dateLabel = formatDate(day.date);
                 return `
-                    <article class="alt-card">
-                        <div class="alt-card__emoji">${item.emoji}</div>
-                        <div>
-                            <h4>${item.title}</h4>
-                            <p>${item.desc}</p>
-                        </div>
-                    </article>
+                    <div class="schedule-row">
+                        <div class="schedule-date">${dateLabel}</div>
+                        <div class="schedule-cell">${renderChips('D', day.day)}</div>
+                        <div class="schedule-cell">${renderChips('E', day.evening)}</div>
+                        <div class="schedule-cell">${renderChips('N', day.night)}</div>
+                    </div>
                 `;
             })
             .join('');
+
+        scheduleTable.innerHTML = header + rows;
     }
 
-    function formatTime(minutes) {
-        if (minutes >= 45) return '45분 이상';
-        return `${minutes}분 이내`;
+    function renderSummary(days, config) {
+        if (!altGrid) return;
+        const totals = days.reduce(
+            (acc, day) => {
+                acc.day += day.day.length;
+                acc.evening += day.evening.length;
+                acc.night += day.night.length;
+                acc.off += day.off.length;
+                return acc;
+            },
+            { day: 0, evening: 0, night: 0, off: 0 }
+        );
+
+        altGrid.innerHTML = `
+            <article class="alt-card">
+                <div class="alt-card__emoji">📌</div>
+                <div>
+                    <h4>${config.wardLabel} 7일 배정</h4>
+                    <p>Day ${totals.day} / Evening ${totals.evening} / Night ${totals.night}</p>
+                </div>
+            </article>
+            <article class="alt-card">
+                <div class="alt-card__emoji">✅</div>
+                <div>
+                    <h4>오프 배정</h4>
+                    <p>총 ${totals.off}회 오프 배정</p>
+                </div>
+            </article>
+        `;
     }
 
-    function formatBudget(level) {
-        if (level === 'low') return '가벼운 예산';
-        if (level === 'high') return '플렉스 예산';
-        return '보통 예산';
+    function formatDate(date) {
+        return `${date.getMonth() + 1}.${date.getDate()} (${['일', '월', '화', '수', '목', '금', '토'][date.getDay()]})`;
     }
 
-    function formatSpice(level) {
-        if (level === 'mild') return '안 매운';
-        if (level === 'hot') return '얼큰';
-        return '적당히';
+    function renderChips(label, names) {
+        if (!names.length) return `<strong>${label}</strong>배정 없음`;
+        return `<strong>${label}</strong>` + names.map((name) => `<span>${name}</span>`).join('');
     }
 });
