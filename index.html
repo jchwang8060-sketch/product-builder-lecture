@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부산백병원 간호사 3교대 스케줄러</title>
+    <title>부산백병원 간호사 3교대 월간 스케줄러</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
                         <span class="theme-toggle__label">다크 모드</span>
                     </button>
                 </div>
-                <h1>간호사 3교대 근무표</h1>
-                <p>필요 인원과 제약 조건을 입력하면 7일 기준 3교대 스케줄을 자동으로 생성합니다.</p>
+                <h1>간호사 3교대 월간 근무표</h1>
+                <p>근무자 이름과 필요 인원을 입력하면 월간(한 달) 3교대 스케줄을 자동으로 생성합니다.</p>
             </div>
             <div class="hero-card">
                 <div class="hero-card__title">스케줄 조건</div>
@@ -37,8 +37,8 @@
                         </select>
                     </label>
                     <label class="filter">
-                        시작일
-                        <input type="date" id="start-date">
+                        대상 월
+                        <input type="month" id="target-month">
                     </label>
                     <label class="filter">
                         간호사 수
@@ -75,7 +75,7 @@
                     <label class="filter full">
                         근무자 이름 추가
                         <input type="text" id="staff-input" placeholder="이름을 입력하고 Enter">
-                        <div class="helper">Enter를 누르거나 , 로 구분해 여러 명을 추가할 수 있어요.</div>
+                        <div class="helper">Enter 또는 , 로 추가됩니다. 월간 근무표에 바로 반영돼요.</div>
                     </label>
                 </div>
                 <div class="staff-list" id="staff-list" aria-live="polite"></div>
@@ -89,19 +89,19 @@
                         <span>주말 근무 분산</span>
                     </label>
                 </div>
-                <button id="recommend-btn">3교대 스케줄 생성</button>
+                <button id="recommend-btn">월간 3교대 스케줄 생성</button>
                 <div class="status" id="status" aria-live="polite"></div>
             </div>
         </header>
 
         <main class="results">
             <section class="featured" aria-live="polite">
-                <div class="featured__label">7일 스케줄</div>
+                <div class="featured__label">월간 스케줄</div>
                 <div class="featured__content" id="featured-card">
                     <div class="featured__emoji">🩺</div>
                     <div class="featured__text">
-                        <h2 id="featured-title">스케줄 생성 대기</h2>
-                        <p id="featured-desc">조건을 입력하고 생성 버튼을 눌러주세요.</p>
+                        <h2 id="featured-title">월간 스케줄 생성 대기</h2>
+                        <p id="featured-desc">근무자 이름과 대상 월을 입력해주세요.</p>
                         <div class="schedule-table" id="schedule-table"></div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
             <section class="alternatives">
                 <div class="alt-header">
                     <h3>스케줄 요약</h3>
-                    <p>교대 배정과 인원 요약을 확인하세요.</p>
+                    <p>월간 교대 배정과 인원 요약을 확인하세요.</p>
                 </div>
                 <div class="alt-grid" id="alt-grid">
                     <article class="alt-card">
