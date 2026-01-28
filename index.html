@@ -163,6 +163,32 @@
             </form>
         </section>
 
+        <section class="comments">
+            <div class="comments__intro">
+                <span class="comments__badge">댓글</span>
+                <h3>피드백을 남겨주세요.</h3>
+                <p>현장 경험과 개선 의견을 공유해주시면 더 좋은 스케줄러로 개선하겠습니다.</p>
+            </div>
+            <div class="comments__embed">
+                <div id="disqus_thread"></div>
+                <script>
+                    /*
+                    var disqus_config = function () {
+                    this.page.url = PAGE_URL;
+                    this.page.identifier = PAGE_IDENTIFIER;
+                    };
+                    */
+                    (function() {
+                        var d = document, s = d.createElement('script');
+                        s.src = 'https://product-builder-11.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+            </div>
+        </section>
+
         <footer class="tips">
             <div class="tip">실제 근무표 확정 전 현장 규정과 휴게 기준을 반드시 확인하세요.</div>
             <div class="tip">필요 인원과 제약을 조정하면 다른 스케줄이 생성됩니다.</div>
