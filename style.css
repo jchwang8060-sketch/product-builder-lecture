@@ -1,25 +1,81 @@
 
+:root {
+    color-scheme: light dark;
+    --bg: #f0f2f5;
+    --bg-gradient: radial-gradient(circle at 10% 10%, #ffffff 0%, #f0f2f5 55%, #e7ebf2 100%);
+    --card: #ffffff;
+    --text: #1e1f22;
+    --muted: #5f6470;
+    --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    --btn-bg: #4caf50;
+    --btn-hover: #45a049;
+    --btn-text: #ffffff;
+    --toggle-bg: #1e1f22;
+    --toggle-text: #ffffff;
+    --toggle-border: transparent;
+}
+
+[data-theme="dark"] {
+    --bg: #0d1117;
+    --bg-gradient: radial-gradient(circle at 15% 15%, #1c212b 0%, #0d1117 60%, #07090c 100%);
+    --card: #151a22;
+    --text: #e6edf3;
+    --muted: #9aa4b2;
+    --shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+    --btn-bg: #2ea043;
+    --btn-hover: #3fb950;
+    --btn-text: #f0f6fc;
+    --toggle-bg: #f0f6fc;
+    --toggle-text: #0d1117;
+    --toggle-border: rgba(240, 246, 252, 0.3);
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5;
+    background-color: var(--bg);
+    background-image: var(--bg-gradient);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    color: var(--text);
 }
 
 .container {
     text-align: center;
-    background-color: #fff;
+    background-color: var(--card);
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    min-width: min(520px, 90vw);
 }
 
 h1 {
-    color: #333;
+    color: var(--text);
     margin-bottom: 30px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.theme-toggle {
+    background-color: var(--toggle-bg);
+    color: var(--toggle-text);
+    border: 1px solid var(--toggle-border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .numbers-container {
@@ -39,13 +95,13 @@ h1 {
     align-items: center;
     font-size: 24px;
     font-weight: bold;
-    color: #333;
+    color: var(--text);
     transition: all 0.3s ease;
 }
 
 #generate-btn {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     padding: 15px 30px;
     border: none;
     border-radius: 10px;
@@ -55,5 +111,5 @@ h1 {
 }
 
 #generate-btn:hover {
-    background-color: #45a049;
+    background-color: var(--btn-hover);
 }
