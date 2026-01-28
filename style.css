@@ -465,6 +465,124 @@ input[type="month"] {
     font-size: 14px;
 }
 
+.partner {
+    margin-top: 56px;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 26px;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    align-items: start;
+}
+
+.partner__intro {
+    display: grid;
+    gap: 12px;
+}
+
+.partner__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--chip-2);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.partner__intro h3 {
+    margin: 0;
+    font-family: "Fraunces", serif;
+    font-size: 28px;
+}
+
+.partner__intro p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.partner-form {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.partner-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.partner-field.full {
+    grid-column: 1 / -1;
+}
+
+.partner-field input,
+.partner-field textarea {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--ink);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.partner-field input:focus,
+.partner-field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow-accent);
+}
+
+.partner-consent {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.partner-consent input {
+    accent-color: var(--accent);
+}
+
+.partner-submit {
+    grid-column: 1 / -1;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.partner-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(240, 96, 65, 0.25);
+}
+
+.partner-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
 .tips {
     margin-top: 48px;
     display: grid;
@@ -521,6 +639,10 @@ input[type="month"] {
     .featured__content {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .partner {
+        grid-template-columns: 1fr;
     }
 }
 
