@@ -71,6 +71,14 @@
                         <input type="number" id="need-off" min="0" max="20" value="2">
                     </label>
                 </div>
+                <div class="filters shift-filters">
+                    <label class="filter full">
+                        근무자 이름 추가
+                        <input type="text" id="staff-input" placeholder="이름을 입력하고 Enter">
+                        <div class="helper">Enter를 누르거나 , 로 구분해 여러 명을 추가할 수 있어요.</div>
+                    </label>
+                </div>
+                <div class="staff-list" id="staff-list" aria-live="polite"></div>
                 <div class="toggles">
                     <label class="toggle">
                         <input type="checkbox" id="night-rest" checked>

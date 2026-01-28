@@ -8,10 +8,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleTable = document.getElementById('schedule-table');
     const altGrid = document.getElementById('alt-grid');
     const startDateInput = document.getElementById('start-date');
+    const staffInput = document.getElementById('staff-input');
+    const staffList = document.getElementById('staff-list');
+
+    const staffNames = [];
 
     const today = new Date();
     if (startDateInput) {
         startDateInput.valueAsDate = today;
+    }
+
+    if (staffInput) {
+        staffInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ',') {
+                event.preventDefault();
+                addStaffFromInput();
+            }
+        });
+        staffInput.addEventListener('blur', addStaffFromInput);
     }
 
     const menuItems = [
@@ -180,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wardLabel: ward.options[ward.selectedIndex].textContent,
             startDate,
             nurseCount,
+            staffNames: staffNames.length ? [...staffNames] : null,
             nightLimit,
             needDay,
             needEvening,
@@ -192,8 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildSchedule(config) {
-        const nurses = Array.from({ length: config.nurseCount }, (_, i) => ({
-            name: `N${String(i + 1).padStart(2, '0')}`,
+        const namePool = config.staffNames || Array.from({ length: config.nurseCount }, (_, i) => `N${String(i + 1).padStart(2, '0')}`);
+        const nurses = namePool.map((name) => ({
+            name,
             assignments: 0,
             lastShift: null,
             consecutiveNights: 0,
@@ -345,5 +361,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderChips(label, names) {
         if (!names.length) return `<strong>${label}</strong>배정 없음`;
         return `<strong>${label}</strong>` + names.map((name) => `<span>${name}</span>`).join('');
+    }
+
+    function addStaffFromInput() {
+        const raw = staffInput.value.trim();
+        if (!raw) return;
+        const parts = raw.split(',').map((name) => name.trim()).filter(Boolean);
+        parts.forEach((name) => {
+            if (!staffNames.includes(name)) {
+                staffNames.push(name);
+            }
+        });
+        staffInput.value = '';
+        renderStaffList();
+        const nurseCountInput = document.getElementById('nurse-count');
+        if (nurseCountInput && staffNames.length) {
+            nurseCountInput.value = staffNames.length;
+        }
+    }
+
+    function removeStaff(name) {
+        const index = staffNames.indexOf(name);
+        if (index >= 0) {
+            staffNames.splice(index, 1);
+            renderStaffList();
+            const nurseCountInput = document.getElementById('nurse-count');
+            if (nurseCountInput) {
+                nurseCountInput.value = staffNames.length || nurseCountInput.value;
+            }
+        }
+    }
+
+    function renderStaffList() {
+        if (!staffList) return;
+        staffList.innerHTML = staffNames
+            .map((name) => {
+                return `
+                    <span class="staff-chip">
+                        ${name}
+                        <button type="button" data-name="${name}" aria-label="${name} 삭제">✕</button>
+                    </span>
+                `;
+            })
+            .join('');
+
+        staffList.querySelectorAll('button[data-name]').forEach((button) => {
+            button.addEventListener('click', () => {
+                removeStaff(button.dataset.name);
+            });
+        });
     }
 });

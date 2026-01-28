@@ -188,6 +188,10 @@ body {
     color: var(--muted);
 }
 
+.filter.full {
+    grid-column: 1 / -1;
+}
+
 select {
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -207,6 +211,12 @@ input[type="date"] {
     font-family: inherit;
     background: var(--card);
     color: var(--ink);
+}
+
+.helper {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
 }
 
 .shift-filters {
@@ -356,6 +366,33 @@ input[type="date"] {
     font-weight: 600;
     color: var(--ink);
     align-self: center;
+}
+
+.staff-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 6px;
+}
+
+.staff-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--ink);
+}
+
+.staff-chip button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
 }
 
 .meta {
