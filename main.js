@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetMonthInput = document.getElementById('target-month');
     const staffInput = document.getElementById('staff-input');
     const staffList = document.getElementById('staff-list');
+    const sampleNote = document.getElementById('sample-note');
 
     const staffNames = [];
 
@@ -196,6 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!scheduleTable || !featuredTitle || !featuredDesc) return;
         featuredTitle.textContent = '월간 3교대 스케줄 생성 완료';
         featuredDesc.textContent = 'Day / Evening / Night / Off 배정을 확인하세요.';
+        if (sampleNote) {
+            sampleNote.textContent = '생성된 스케줄입니다. 현장 규정에 맞춰 검토 후 확정하세요.';
+        }
 
         const header = `
             <div class="schedule-row schedule-head">
